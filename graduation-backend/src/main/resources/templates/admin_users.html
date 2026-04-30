@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tài khoản - Graduation Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="text-xl font-bold tracking-wide flex items-center gap-2">
+                <i class="fas fa-graduation-cap"></i> Graduation Management
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-list mr-1"></i> Điều kiện</a>
+                <a href="/results" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-poll mr-1"></i> Kết quả</a>
+                <a sec:authorize="hasAuthority('ROLE_SUPERADMIN')" href="/admin/users" class="bg-white/20 px-3 py-2 rounded-lg transition text-sm font-semibold"><i class="fas fa-users-cog mr-1"></i> Quản lý User</a>
+                <span class="text-sm opacity-80">|</span>
+                <span class="text-sm" sec:authentication="name"></span>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-sign-out-alt mr-1"></i> Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800"><i class="fas fa-users-cog text-indigo-600 mr-2"></i>Quản lý Tài khoản</h1>
+                <p class="text-gray-500 mt-1">Quản lý danh sách người dùng, cấp quyền và điều chỉnh trạng thái.</p>
+            </div>
+            <span class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-semibold text-sm">
+                <i class="fas fa-user-shield mr-1"></i> Superadmin Panel
+            </span>
+        </div>
+
+        <!-- Alert messages -->
+        <div th:if="${successMsg}" class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 mb-6 rounded-r-lg shadow-sm flex items-center gap-2">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${errorMsg}" class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 mb-6 rounded-r-lg shadow-sm flex items-center gap-2">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+            <span th:text="${errorMsg}"></span>
+        </div>
+
+        <!-- User Table -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gradient-to-r from-gray-50 to-gray-100 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-6 py-4">#</th>
+                        <th class="px-6 py-4">Họ tên</th>
+                        <th class="px-6 py-4">Username</th>
+                        <th class="px-6 py-4">Email</th>
+                        <th class="px-6 py-4">Quyền</th>
+                        <th class="px-6 py-4">Trạng thái</th>
+                        <th class="px-6 py-4 text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:each="user, stat : ${users}" class="hover:bg-indigo-50/40 transition-colors duration-150">
+                        <td class="px-6 py-4 text-gray-500 text-sm" th:text="${stat.index + 1}">1</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                                     th:text="${user.fullName != null ? user.fullName.substring(0,1).toUpperCase() : 'U'}">U</div>
+                                <span class="font-medium text-gray-800" th:text="${user.fullName ?: 'N/A'}">Nguyễn Văn A</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-700 font-mono text-sm" th:text="${user.username}">admin</td>
+                        <td class="px-6 py-4 text-gray-500 text-sm" th:text="${user.email ?: '—'}">email@test.com</td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-wrap gap-1">
+                                <span th:each="role : ${user.roles}"
+                                      th:text="${role.name.replace('ROLE_', '')}"
+                                      th:classappend="${role.name == 'ROLE_SUPERADMIN' ? 'bg-red-100 text-red-700' : (role.name == 'ROLE_ADMIN' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700')}"
+                                      class="px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                                    ADMIN
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span th:if="${user.isActive}" class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Hoạt động
+                            </span>
+                            <span th:unless="${user.isActive}" class="inline-flex items-center gap-1 bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-semibold">
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span> Vô hiệu
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <!-- Không hiện action cho superadmin -->
+                            <div th:if="${!user.roles.![name].contains('ROLE_SUPERADMIN')}" class="flex items-center justify-center gap-2">
+                                <!-- Grant/Revoke Admin -->
+                                <div th:if="${!user.roles.![name].contains('ROLE_ADMIN')}">
+                                    <form th:action="@{/admin/users/grant-admin/{id}(id=${user.id})}" method="post">
+                                        <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm" title="Cấp quyền Admin">
+                                            <i class="fas fa-arrow-up mr-1"></i>Cấp Admin
+                                        </button>
+                                    </form>
+                                </div>
+                                <div th:if="${user.roles.![name].contains('ROLE_ADMIN')}">
+                                    <form th:action="@{/admin/users/revoke-admin/{id}(id=${user.id})}" method="post">
+                                        <button type="submit" class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm" title="Thu hồi quyền Admin">
+                                            <i class="fas fa-arrow-down mr-1"></i>Thu Admin
+                                        </button>
+                                    </form>
+                                </div>
+                                <!-- Toggle Active -->
+                                <form th:action="@{/admin/users/toggle-active/{id}(id=${user.id})}" method="post">
+                                    <button type="submit" th:class="${user.isActive ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'}"
+                                            class="text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm"
+                                            th:title="${user.isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}">
+                                        <i th:class="${user.isActive ? 'fas fa-lock' : 'fas fa-unlock'}" class="mr-1"></i>
+                                        <span th:text="${user.isActive ? 'Khóa' : 'Mở'}">Khóa</span>
+                                    </button>
+                                </form>
+                                <!-- Delete -->
+                                <form th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post"
+                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?')">
+                                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm" title="Xóa tài khoản">
+                                        <i class="fas fa-trash-alt mr-1"></i>Xóa
+                                    </button>
+                                </form>
+                            </div>
+                            <div th:if="${user.roles.![name].contains('ROLE_SUPERADMIN')}" class="text-center">
+                                <span class="text-gray-400 text-xs italic"><i class="fas fa-shield-alt mr-1"></i>Được bảo vệ</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(users)}" class="text-center py-16 text-gray-400">
+                <i class="fas fa-users text-5xl mb-4"></i>
+                <p class="text-lg">Chưa có người dùng nào trong hệ thống.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

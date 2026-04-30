@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điều kiện Xét Tốt nghiệp - Graduation Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="text-xl font-bold tracking-wide flex items-center gap-2">
+                <i class="fas fa-graduation-cap"></i> Graduation Management
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/" class="bg-white/20 px-3 py-2 rounded-lg transition text-sm font-semibold"><i class="fas fa-list mr-1"></i> Điều kiện</a>
+                <a href="/results" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-poll mr-1"></i> Kết quả</a>
+                <a sec:authorize="hasAuthority('ROLE_SUPERADMIN')" href="/admin/users" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-users-cog mr-1"></i> Quản lý User</a>
+                <span class="text-sm opacity-80">|</span>
+                <span class="text-sm" sec:authentication="name"></span>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-sign-out-alt mr-1"></i> Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800"><i class="fas fa-clipboard-list text-indigo-600 mr-2"></i>Điều kiện Xét Tốt nghiệp</h1>
+                <p class="text-gray-500 mt-1">Danh sách các điều kiện xét tốt nghiệp hiện có trong hệ thống.</p>
+            </div>
+            <a sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERADMIN')" href="/conditions/new"
+               class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2">
+                <i class="fas fa-plus"></i> Thêm mới
+            </a>
+        </div>
+
+        <!-- Alert messages -->
+        <div th:if="${successMsg}" class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 mb-6 rounded-r-lg shadow-sm flex items-center gap-2">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${errorMsg}" class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 mb-6 rounded-r-lg shadow-sm flex items-center gap-2">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+            <span th:text="${errorMsg}"></span>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gradient-to-r from-gray-50 to-gray-100 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                        <th class="px-6 py-4">#</th>
+                        <th class="px-6 py-4">Khóa áp dụng</th>
+                        <th class="px-6 py-4">Tín chỉ tối thiểu</th>
+                        <th class="px-6 py-4">GPA tối thiểu</th>
+                        <th class="px-6 py-4">Chuẩn Tiếng Anh</th>
+                        <th class="px-6 py-4">Trạng thái</th>
+                        <th sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERADMIN')" class="px-6 py-4 text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <tr th:each="cond, stat : ${listConditions}" class="hover:bg-indigo-50/40 transition-colors duration-150">
+                        <td class="px-6 py-4 text-gray-500 text-sm" th:text="${stat.index + 1}">1</td>
+                        <td class="px-6 py-4 font-medium text-gray-800" th:text="${cond.appliedCohort}">K22</td>
+                        <td class="px-6 py-4 text-gray-700" th:text="${cond.minTotalCredits}">120</td>
+                        <td class="px-6 py-4 text-gray-700" th:text="${cond.minGpa}">2.0</td>
+                        <td class="px-6 py-4 text-gray-700" th:text="${cond.englishRequirement}">TOEIC</td>
+                        <td class="px-6 py-4">
+                            <span th:if="${cond.isActive}" class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Đang áp dụng
+                            </span>
+                            <span th:unless="${cond.isActive}" class="inline-flex items-center gap-1 bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-semibold">
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span> Vô hiệu hóa
+                            </span>
+                        </td>
+                        <td sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERADMIN')" class="px-6 py-4">
+                            <div class="flex items-center justify-center gap-2">
+                                <a th:href="@{/conditions/edit/{id}(id=${cond.id})}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm" title="Chỉnh sửa">
+                                    <i class="fas fa-edit mr-1"></i>Sửa
+                                </a>
+                                <a th:href="@{/conditions/delete/{id}(id=${cond.id})}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa?')" title="Xóa">
+                                    <i class="fas fa-trash-alt mr-1"></i>Xóa
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${#lists.isEmpty(listConditions)}" class="text-center py-16 text-gray-400">
+                <i class="fas fa-folder-open text-5xl mb-4"></i>
+                <p class="text-lg">Chưa có điều kiện tốt nghiệp nào.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

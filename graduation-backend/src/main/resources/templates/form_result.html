@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? 'Sửa Kết quả' : 'Thêm Kết quả'} + ' - Graduation Management'">Form Kết quả</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- NAVBAR -->
+    <nav class="bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="text-xl font-bold tracking-wide flex items-center gap-2">
+                <i class="fas fa-graduation-cap"></i> Graduation Management
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-list mr-1"></i> Điều kiện</a>
+                <a href="/results" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-poll mr-1"></i> Kết quả</a>
+                <a sec:authorize="hasAuthority('ROLE_SUPERADMIN')" href="/admin/users" class="hover:bg-white/20 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-users-cog mr-1"></i> Quản lý User</a>
+                <span class="text-sm opacity-80">|</span>
+                <span class="text-sm" sec:authentication="name"></span>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-lg transition text-sm"><i class="fas fa-sign-out-alt mr-1"></i> Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">
+                <i class="fas fa-poll text-purple-600 mr-2"></i>
+                <span th:text="${isEdit ? 'Sửa Kết quả Xét Tốt nghiệp' : 'Thêm Kết quả Xét Tốt nghiệp'}">Form</span>
+            </h1>
+            <p class="text-gray-500 mt-1" th:text="${isEdit ? 'Chỉnh sửa thông tin kết quả xét tốt nghiệp.' : 'Nhập thông tin kết quả xét tốt nghiệp cho sinh viên.'}">Mô tả</p>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <form th:action="@{/results/save}" th:object="${resultDTO}" method="post" class="space-y-6">
+                <!-- Hidden ID cho Sửa -->
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="studentId" class="block text-sm font-medium text-gray-700 mb-1">
+                            Mã sinh viên <span class="text-gray-400 font-normal text-xs">(VD: K22-123456)</span>
+                        </label>
+                        <input type="text" id="studentId" th:field="*{studentId}" maxlength="20"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                            placeholder="VD: K22-123456">
+                    </div>
+                    <div>
+                        <label for="conditionId" class="block text-sm font-medium text-gray-700 mb-1">Điều kiện áp dụng</label>
+                        <select id="conditionId" th:field="*{conditionId}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                            <option value="">-- Chọn điều kiện --</option>
+                            <option th:each="cond : ${conditions}"
+                                    th:value="${cond.id.toString()}"
+                                    th:text="${cond.appliedCohort + ' - GPA >= ' + (cond.minGpa != null ? cond.minGpa : 'N/A')}">
+                                Condition
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="gpa" class="block text-sm font-medium text-gray-700 mb-1">GPA</label>
+                        <input type="number" step="0.01" id="gpa" th:field="*{gpa}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                            placeholder="VD: 3.25">
+                    </div>
+                    <div>
+                        <label for="totalCredits" class="block text-sm font-medium text-gray-700 mb-1">Tổng tín chỉ</label>
+                        <input type="number" id="totalCredits" th:field="*{totalCredits}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                            placeholder="VD: 130">
+                    </div>
+                    <div>
+                        <label for="failedCredits" class="block text-sm font-medium text-gray-700 mb-1">Tín chỉ nợ</label>
+                        <input type="number" id="failedCredits" th:field="*{failedCredits}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                            placeholder="VD: 0">
+                    </div>
+                    <div>
+                        <label for="result" class="block text-sm font-medium text-gray-700 mb-1">Kết quả</label>
+                        <select id="result" th:field="*{result}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                            <option value="">-- Chọn kết quả --</option>
+                            <option value="1">Đạt</option>
+                            <option value="0">Không đạt</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="classification" class="block text-sm font-medium text-gray-700 mb-1">Xếp loại</label>
+                        <select id="classification" th:field="*{classification}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                            <option value="">-- Chọn xếp loại --</option>
+                            <option value="1">Xuất sắc</option>
+                            <option value="2">Giỏi</option>
+                            <option value="3">Khá</option>
+                            <option value="4">Trung bình</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="decisionDate" class="block text-sm font-medium text-gray-700 mb-1">Ngày quyết định</label>
+                        <input type="date" id="decisionDate" th:field="*{decisionDate}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                    </div>
+                    <div>
+                        <label for="reviewer" class="block text-sm font-medium text-gray-700 mb-1">Người xét duyệt (UUID)</label>
+                        <input type="text" id="reviewer" th:field="*{reviewer}"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                            placeholder="UUID người xét duyệt">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="note" class="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+                    <textarea id="note" th:field="*{note}" rows="3"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+                        placeholder="Ghi chú thêm (nếu có)..."></textarea>
+                </div>
+
+                <div class="flex items-center gap-4 pt-4">
+                    <button type="submit"
+                        class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2">
+                        <i th:class="${isEdit ? 'fas fa-save' : 'fas fa-plus'}"></i>
+                        <span th:text="${isEdit ? 'Cập nhật' : 'Thêm mới'}">Lưu</span>
+                    </button>
+                    <a href="/results" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-xl transition-all duration-200">
+                        <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
