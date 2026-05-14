@@ -2,6 +2,7 @@ package com.schoolmanager.graduation_backend.service;
 
 import com.schoolmanager.graduation_backend.dto.request.ResultRequestDTO;
 import com.schoolmanager.graduation_backend.entity.GraduationResult;
+import com.schoolmanager.graduation_backend.entity.Student;
 import com.schoolmanager.graduation_backend.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,19 @@ public class ResultService {
         return resultRepository.findAll();
     }
 
+    public List<GraduationResult> findByStudentId(String studentId) {
+        if (studentId == null || studentId.isBlank()) {
+            return List.of();
+        }
+        return resultRepository.findByStudentId(studentId.trim());
+    }
+
     public GraduationResult findById(UUID id) {
         return resultRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy kết quả xét tốt nghiệp với ID: " + id));
     }
 
-    public void save(ResultRequestDTO dto) {
+    public GraduationResult save(ResultRequestDTO dto) {
         GraduationResult entity;
 
         if (dto.getId() != null && !dto.getId().isBlank()) {
@@ -50,7 +58,33 @@ public class ResultService {
         entity.setNote(dto.getNote());
         // createdAt/updatedAt và createdBy/updatedBy được JPA Auditing xử lý tự động
 
-        resultRepository.save(entity);
+        return resultRepository.save(entity);
+    }
+
+    public void ensurePendingResult(Student student) {
+        if (student == null || student.getStudentCode() == null || student.getStudentCode().isBlank()) {
+            return;
+        }
+
+        String studentCode = student.getStudentCode().trim();
+        if (resultRepository.existsByStudentId(studentCode)) {
+            return;
+        }
+
+        GraduationResult result = new GraduationResult();
+        result.setStudentId(studentCode);
+        result.setGpa(student.getGpa());
+        result.setTotalCredits(student.getTotalCredits());
+        result.setFailedCredits(student.getFailedCredits());
+        result.setResult(null);
+        result.setClassification(null);
+        result.setNote("Chờ xét tốt nghiệp");
+        result.setIsActive(true);
+        resultRepository.save(result);
+    }
+
+    public void ensurePendingResults(List<Student> students) {
+        students.forEach(this::ensurePendingResult);
     }
 
     public void softDelete(UUID id) {
@@ -58,6 +92,26 @@ public class ResultService {
         entity.setIsActive(false);
         entity.setDeletedAt(LocalDateTime.now());
         resultRepository.save(entity);
+    }
+
+    public void hardDelete(UUID id) {
+        findById(id);
+        resultRepository.deleteById(id);
+    }
+
+    public void relinkStudentCode(String oldStudentCode, String newStudentCode) {
+        if (oldStudentCode == null || newStudentCode == null || oldStudentCode.equals(newStudentCode)) {
+            return;
+        }
+        List<GraduationResult> results = resultRepository.findByStudentId(oldStudentCode);
+        results.forEach(result -> result.setStudentId(newStudentCode));
+        resultRepository.saveAll(results);
+    }
+
+    public void hardDeleteByStudentCode(String studentCode) {
+        if (studentCode != null && !studentCode.isBlank()) {
+            resultRepository.deleteByStudentId(studentCode.trim());
+        }
     }
 
     /** Chuyển String → UUID an toàn; trả về null nếu chuỗi rỗng hoặc null */
