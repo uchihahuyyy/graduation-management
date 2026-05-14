@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chi tiết sinh viên</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/graduation-dark.css}">
+</head>
+<body class="hold-transition sidebar-mini layout-fixed gm-dark">
+<div class="wrapper">
+    <nav class="main-header navbar navbar-expand"><ul class="navbar-nav"><li class="nav-item"><a href="/students" class="nav-link"><i class="fas fa-arrow-left"></i> Danh sách sinh viên</a></li></ul></nav>
+    <aside class="main-sidebar elevation-4"><a href="/dashboard" class="brand-link"><span class="brand-badge"><i class="fas fa-graduation-cap"></i></span><span class="brand-text">Graduation System</span></a></aside>
+    <div class="content-wrapper"><section class="content"><div class="container-fluid gm-shell">
+        <h1 class="gm-page-title" th:text="${student.fullName}">Nguyễn Văn A</h1>
+        <div class="card gm-crud-card">
+            <div class="card-header p-0 pt-1"><ul class="nav nav-tabs" role="tablist"><li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#info">Thông tin</a></li><li class="nav-item"><a class="nav-link" data-toggle="pill" href="#study">Kết quả học tập</a></li><li class="nav-item"><a class="nav-link" data-toggle="pill" href="#graduation">Xét tốt nghiệp</a></li></ul></div>
+            <div class="card-body tab-content">
+                <div class="tab-pane fade show active" id="info">
+                    <div class="row"><div class="col-md-6"><p><strong>Mã SV:</strong> <span th:text="${student.studentCode}"></span></p><p><strong>Email:</strong> <span th:text="${student.email}"></span></p><p><strong>Ngày sinh:</strong> <span th:text="${student.dateOfBirth}"></span></p><p><strong>Giới tính:</strong> <span th:text="${student.gender}"></span></p></div><div class="col-md-6"><p><strong>Lớp:</strong> <span th:text="${student.className}"></span></p><p><strong>Khóa:</strong> <span th:text="${student.cohort}"></span></p><p><strong>Trạng thái:</strong> <span th:if="${student.isActive}" class="badge badge-success">Active</span><span th:unless="${student.isActive}" class="badge badge-secondary">Inactive</span></p></div></div>
+                </div>
+                <div class="tab-pane fade" id="study">
+                    <table class="table table-hover"><thead><tr><th>GPA</th><th>TC tích lũy</th><th>Tín chỉ rớt</th><th>Tiếng Anh</th><th>Tin học</th></tr></thead><tbody><tr><td th:text="${student.gpa}"></td><td th:text="${student.totalCredits}"></td><td th:text="${student.failedCredits}"></td><td th:text="${student.englishStatus}"></td><td th:text="${student.itStatus}"></td></tr></tbody></table>
+                </div>
+                <div class="tab-pane fade" id="graduation">
+                    <div th:if="${graduationResult == null}" class="text-muted">Chưa có kết quả xét tốt nghiệp.</div>
+                    <div th:if="${graduationResult != null}"><p><strong>Kết quả:</strong> <span th:if="${graduationResult.result == 1}" class="badge badge-success">Đạt</span><span th:if="${graduationResult.result == 0}" class="badge badge-danger">Không đạt</span></p><p><strong>Ngày xét:</strong> <span th:text="${graduationResult.decisionDate}"></span></p><a th:href="@{/results/detail/{id}(id=${graduationResult.id})}" class="btn btn-secondary btn-sm">Xem chi tiết xét tốt nghiệp</a></div>
+                </div>
+            </div>
+        </div>
+    </div></section></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>
