@@ -2,6 +2,8 @@ package com.schoolmanager.graduation_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.schoolmanager.graduation_backend.util.VietnameseTextFixer;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -46,7 +48,13 @@ public class GraduationResult extends BaseAuditEntity {
 
     @Column(name = "reviewer")
     private UUID reviewer;
-
     @Column(name = "note", columnDefinition = "NVARCHAR(MAX)")
     private String note;
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizeVietnameseText() {
+        note = VietnameseTextFixer.fix(note);
+    }
 }

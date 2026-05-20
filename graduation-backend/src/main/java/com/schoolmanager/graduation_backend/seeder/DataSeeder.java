@@ -39,22 +39,7 @@ public class DataSeeder implements CommandLineRunner {
 
         seedDefaultProgram();
 
-        // Seed Superadmin
-        if (!userRepository.existsByUsername("superadmin")) {
-            User superadmin = new User();
-            superadmin.setUsername("superadmin");
-            superadmin.setPassword(passwordEncoder.encode("superadmin"));
-            superadmin.setFullName("System Super Administrator");
-            superadmin.setCreatedAt(LocalDateTime.now());
-            superadmin.setIsActive(true);
-            
-            Set<Role> roles = new HashSet<>();
-            roles.add(superadminRole);
-            superadmin.setRoles(roles);
-            
-            userRepository.save(superadmin);
-            System.out.println("Superadmin account seeded successfully!");
-        }
+        seedOrRepairSuperadmin(superadminRole);
     }
 
     private Role createRoleIfNotFound(String name) {
@@ -81,5 +66,25 @@ public class DataSeeder implements CommandLineRunner {
         program.setCreatedAt(LocalDateTime.now());
         program.setIsActive(true);
         programRepository.save(program);
+    }
+
+    private void seedOrRepairSuperadmin(Role superadminRole) {
+        User superadmin = userRepository.findByUsername("superadmin").orElseGet(() -> {
+            User user = new User();
+            user.setUsername("superadmin");
+            user.setCreatedAt(LocalDateTime.now());
+            return user;
+        });
+
+        superadmin.setPassword(passwordEncoder.encode("superadmin"));
+        superadmin.setFullName("System Super Administrator");
+        superadmin.setIsActive(true);
+
+        Set<Role> roles = superadmin.getRoles() != null ? superadmin.getRoles() : new HashSet<>();
+        roles.add(superadminRole);
+        superadmin.setRoles(roles);
+
+        userRepository.save(superadmin);
+        System.out.println("Superadmin account is ready: username=superadmin, password=superadmin");
     }
 }

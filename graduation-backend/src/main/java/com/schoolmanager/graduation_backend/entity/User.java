@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.schoolmanager.graduation_backend.util.VietnameseTextFixer;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -29,7 +31,6 @@ public class User extends BaseAuditEntity {
 
     @Column(name = "email", length = 100)
     private String email;
-
     @Column(name = "full_name", length = 100)
     private String fullName;
 
@@ -40,4 +41,11 @@ public class User extends BaseAuditEntity {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizeVietnameseText() {
+        fullName = VietnameseTextFixer.fix(fullName);
+    }
 }
