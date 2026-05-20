@@ -4,6 +4,7 @@ import com.schoolmanager.graduation_backend.dto.request.ConditionRequestDTO;
 import com.schoolmanager.graduation_backend.entity.GraduationCondition;
 import com.schoolmanager.graduation_backend.repository.ConditionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,17 +21,18 @@ public class ConditionService {
         return conditionRepository.findAll();
     }
 
-    public GraduationCondition findById(UUID id) {
+    public GraduationCondition findById(@NonNull UUID id) {
         return conditionRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy điều kiện xét tốt nghiệp với ID: " + id));
     }
 
-    public void save(ConditionRequestDTO dto) {
+    public GraduationCondition save(ConditionRequestDTO dto) {
         GraduationCondition entity;
 
-        if (dto.getId() != null) {
+        UUID id = dto.getId();
+        if (id != null) {
             // Sửa: tìm entity cũ rồi cập nhật
-            entity = findById(dto.getId());
+            entity = findById(id);
         } else {
             // Thêm mới
             entity = new GraduationCondition();
@@ -48,13 +50,18 @@ public class ConditionService {
         entity.setNote(dto.getNote());
         // createdAt/updatedAt và createdBy/updatedBy được JPA Auditing xử lý tự động
 
-        conditionRepository.save(entity);
+        return conditionRepository.save(entity);
     }
 
-    public void softDelete(UUID id) {
+    public void softDelete(@NonNull UUID id) {
         GraduationCondition entity = findById(id);
         entity.setIsActive(false);
         entity.setDeletedAt(LocalDateTime.now());
         conditionRepository.save(entity);
+    }
+
+    public void hardDelete(@NonNull UUID id) {
+        findById(id);
+        conditionRepository.deleteById(id);
     }
 }

@@ -15,7 +15,7 @@
         <a href="/dashboard" class="brand-link"><span class="brand-badge"><i class="fas fa-graduation-cap"></i></span><span class="brand-text">Graduation System</span></a>
         <div class="sidebar"><nav class="mt-4"><ul class="nav nav-pills nav-sidebar flex-column">
             <li class="nav-item"><a href="/dashboard" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
-            <li class="nav-header">XI. NHÓM QUẢN LÝ TỐT NGHIỆP</li>
+            <li class="nav-header">NHÓM QUẢN LÝ TỐT NGHIỆP</li>
             <li class="nav-item"><a href="/students" class="nav-link active"><i class="nav-icon far fa-circle"></i><p>Sinh viên</p></a></li>
             <li class="nav-item"><a href="/conditions" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Điều kiện tốt nghiệp</p></a></li>
             <li class="nav-item"><a href="/assessment" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Xét tốt nghiệp</p></a></li>
@@ -55,7 +55,7 @@
                     <tbody>
                     <tr th:each="student : ${students}" data-row>
                         <td th:text="${student.studentCode}">SV001</td><td th:text="${student.fullName}">Nguyễn Văn A</td><td th:text="${student.className}">DCT121</td><td th:text="${student.cohort}">K21</td><td th:text="${student.gpa}">3.2</td><td th:text="${student.totalCredits}">120</td>
-                        <td><span th:if="${student.isActive}" class="badge badge-success">Active</span><span th:unless="${student.isActive}" class="badge badge-secondary">Inactive</span></td>
+                        <td th:with="studentStatus=${student.status != null and !student.status.isBlank() ? student.status : 'Đang học'}"><span class="badge" th:classappend="${studentStatus == 'Đang học' ? ' badge-primary' : (studentStatus == 'Đủ điều kiện TN' ? ' badge-success' : (studentStatus == 'Chờ xét TN' ? ' badge-warning' : (studentStatus == 'Đã tốt nghiệp' ? ' badge-info' : (studentStatus == 'Bảo lưu' ? ' badge-secondary' : (studentStatus == 'Thôi học' ? ' badge-dark' : (studentStatus == 'Cảnh báo học vụ' ? ' badge-danger' : ' badge-warning'))))))}" th:text="${studentStatus}">Đang học</span></td>
                         <td class="text-center"><a th:href="@{/students/detail/{id}(id=${student.id})}" class="btn btn-secondary btn-sm gm-action"><i class="fas fa-eye"></i> Chi tiết</a><a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-info btn-sm gm-action" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERADMIN','ROLE_GIAOVU')"><i class="fas fa-edit"></i> Sửa</a><a th:href="@{/students/delete/{id}(id=${student.id})}" class="btn btn-danger btn-sm gm-action" sec:authorize="hasAnyAuthority('ROLE_ADMIN','ROLE_SUPERADMIN')" onclick="return confirm('Xóa sinh viên này khỏi database SQL Server?')"><i class="fas fa-trash"></i> Xóa</a></td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(students)}"><td colspan="8" class="text-center text-muted py-4">Chưa có sinh viên nào.</td></tr>

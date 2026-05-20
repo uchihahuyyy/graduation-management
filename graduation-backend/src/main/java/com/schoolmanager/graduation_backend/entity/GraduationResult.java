@@ -18,8 +18,8 @@ public class GraduationResult extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "student_id", length = 20)
-    private String studentId;
+    @Column(name = "student_id")
+    private UUID studentId;
 
     @Column(name = "condition_id")
     private UUID conditionId;
@@ -33,7 +33,7 @@ public class GraduationResult extends BaseAuditEntity {
     @Column(name = "failed_credits")
     private Integer failedCredits;
 
-    // 0: Không đạt, 1: Đạt
+    // null: Chờ xét, 0: Không đạt, 1: Đạt
     @Column(name = "result")
     private Byte result;
 

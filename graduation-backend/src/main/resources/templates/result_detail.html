@@ -15,7 +15,7 @@
         <a href="/dashboard" class="brand-link"><span class="brand-badge"><i class="fas fa-graduation-cap"></i></span><span class="brand-text">Graduation System</span></a>
         <div class="sidebar"><nav class="mt-4"><ul class="nav nav-pills nav-sidebar flex-column">
             <li class="nav-item"><a href="/dashboard" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
-            <li class="nav-header">XI. NHÓM QUẢN LÝ TỐT NGHIỆP</li>
+            <li class="nav-header">NHÓM QUẢN LÝ TỐT NGHIỆP</li>
             <li class="nav-item"><a href="/conditions" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Điều kiện tốt nghiệp</p></a></li>
             <li class="nav-item"><a href="/assessment" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Xét tốt nghiệp</p></a></li>
             <li class="nav-item"><a href="/results" class="nav-link active"><i class="nav-icon far fa-circle"></i><p>Kết quả xét tốt nghiệp</p></a></li>
@@ -26,7 +26,7 @@
             <h1 class="gm-page-title">Chi tiết kết quả tốt nghiệp</h1>
             <div class="row">
                 <div class="col-md-4"><div class="card gm-crud-card"><div class="card-header"><h3 class="card-title">Thông tin sinh viên</h3></div><div class="card-body">
-                    <p><strong>Mã SV:</strong> <span th:text="${result.studentId}">SV001</span></p>
+                    <p><strong>Mã SV:</strong> <span th:text="${student != null ? student.studentCode : result.studentId}">SV001</span></p>
                     <p><strong>Họ tên:</strong> <span th:text="${student != null ? student.fullName : 'Không tìm thấy sinh viên'}">Nguyễn Văn A</span></p>
                     <p><strong>Lớp:</strong> <span th:text="${student != null ? student.className : 'N/A'}">DCT121A</span></p>
                     <p><strong>Khóa:</strong> <span th:text="${student != null ? student.cohort : 'N/A'}">K21</span></p>

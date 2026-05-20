@@ -17,6 +17,7 @@ BEGIN
         failed_credits INT,
         english_status NVARCHAR(100),
         it_status NVARCHAR(100),
+        status NVARCHAR(50) DEFAULT N'Đang học',
         created_at DATETIME2,
         updated_at DATETIME2,
         created_by UNIQUEIDENTIFIER,
@@ -26,6 +27,17 @@ BEGIN
         is_active BIT DEFAULT 1
     );
 END
+GO
+
+IF COL_LENGTH('students', 'status') IS NULL
+BEGIN
+    ALTER TABLE students ADD status NVARCHAR(50) DEFAULT N'Đang học';
+END
+GO
+
+UPDATE students
+SET status = N'Đang học'
+WHERE status IS NULL OR LTRIM(RTRIM(status)) = N'';
 GO
 
 IF NOT EXISTS (SELECT 1 FROM students WHERE student_code = N'K21-000001')
@@ -44,21 +56,22 @@ BEGIN
         failed_credits,
         english_status,
         it_status,
+        status,
         created_at,
         updated_at,
         is_active
     )
     VALUES
-    (NEWID(), N'K21-000001', N'Nguyễn Văn An', 'an.nguyen@example.com', '2003-01-15', N'Nam', N'DCT121A', N'K21', 3.60, 128, 0, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K21-000002', N'Trần Thị Bình', 'binh.tran@example.com', '2003-03-22', N'Nữ', N'DCT121A', N'K21', 3.20, 125, 0, N'TOEIC 520', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K21-000003', N'Lê Quốc Cường', 'cuong.le@example.com', '2003-07-10', N'Nam', N'DCT121B', N'K21', 2.75, 121, 0, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K21-000004', N'Phạm Minh Duy', 'duy.pham@example.com', '2003-05-18', N'Nam', N'DCT121B', N'K21', 1.95, 126, 0, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K22-000001', N'Đặng Hoàng Khang', 'khang.dang@example.com', '2004-02-11', N'Nam', N'DCT122A', N'K22', 3.45, 130, 1, N'TOEIC 510', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K22-000002', N'Bùi Ngọc Lan', 'lan.bui@example.com', '2004-04-04', N'Nữ', N'DCT122A', N'K22', 2.80, 126, 2, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K22-000003', N'Hoàng Gia Minh', 'minh.hoang@example.com', '2004-08-20', N'Nam', N'DCT122B', N'K22', 2.10, 124, 2, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K22-000004', N'Ngô Phương Nhi', 'nhi.ngo@example.com', '2004-10-12', N'Nữ', N'DCT122B', N'K22', 2.65, 128, 5, N'TOEIC 530', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K23-000001', N'Đỗ Thành Phúc', 'phuc.do@example.com', '2004-12-01', N'Nam', N'DCT123A', N'K23', 3.85, 135, 0, N'TOEIC 700', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1),
-    (NEWID(), N'K23-000002', N'Võ Thị Hạnh', 'hanh.vo@example.com', '2004-09-02', N'Nữ', N'DCT123A', N'K23', 2.15, 132, 0, N'B1', N'Đạt', SYSDATETIME(), SYSDATETIME(), 1);
+    (NEWID(), N'K21-000001', N'Nguyễn Văn An', 'an.nguyen@example.com', '2003-01-15', N'Nam', N'DCT121A', N'K21', 3.60, 128, 0, N'B1', N'Đạt', N'Đủ điều kiện TN', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K21-000002', N'Trần Thị Bình', 'binh.tran@example.com', '2003-03-22', N'Nữ', N'DCT121A', N'K21', 3.20, 125, 0, N'TOEIC 520', N'Đạt', N'Chờ xét TN', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K21-000003', N'Lê Quốc Cường', 'cuong.le@example.com', '2003-07-10', N'Nam', N'DCT121B', N'K21', 2.75, 121, 0, N'B1', N'Đạt', N'Đang học', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K21-000004', N'Phạm Minh Duy', 'duy.pham@example.com', '2003-05-18', N'Nam', N'DCT121B', N'K21', 1.95, 126, 0, N'B1', N'Đạt', N'Cảnh báo học vụ', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K22-000001', N'Đặng Hoàng Khang', 'khang.dang@example.com', '2004-02-11', N'Nam', N'DCT122A', N'K22', 3.45, 130, 1, N'TOEIC 510', N'Đạt', N'Đủ điều kiện TN', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K22-000002', N'Bùi Ngọc Lan', 'lan.bui@example.com', '2004-04-04', N'Nữ', N'DCT122A', N'K22', 2.80, 126, 2, N'B1', N'Đạt', N'Đang học', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K22-000003', N'Hoàng Gia Minh', 'minh.hoang@example.com', '2004-08-20', N'Nam', N'DCT122B', N'K22', 2.10, 124, 2, N'B1', N'Đạt', N'Nợ môn', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K22-000004', N'Ngô Phương Nhi', 'nhi.ngo@example.com', '2004-10-12', N'Nữ', N'DCT122B', N'K22', 2.65, 128, 5, N'TOEIC 530', N'Đạt', N'Nợ môn', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K23-000001', N'Đỗ Thành Phúc', 'phuc.do@example.com', '2004-12-01', N'Nam', N'DCT123A', N'K23', 3.85, 135, 0, N'TOEIC 700', N'Đạt', N'Đã tốt nghiệp', SYSDATETIME(), SYSDATETIME(), 1),
+    (NEWID(), N'K23-000002', N'Võ Thị Hạnh', 'hanh.vo@example.com', '2004-09-02', N'Nữ', N'DCT123A', N'K23', 2.15, 132, 0, N'B1', N'Đạt', N'Cảnh báo học vụ', SYSDATETIME(), SYSDATETIME(), 1);
 END
 GO
 

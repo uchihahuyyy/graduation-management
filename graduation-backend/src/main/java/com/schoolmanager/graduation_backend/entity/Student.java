@@ -62,4 +62,7 @@ public class Student extends BaseAuditEntity {
 
     @Column(name = "it_status", length = 100)
     private String itStatus;
+
+    @Column(name = "status", length = 50)
+    private String status;
 }

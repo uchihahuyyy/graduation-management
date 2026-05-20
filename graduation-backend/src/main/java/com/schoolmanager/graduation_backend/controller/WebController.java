@@ -82,8 +82,9 @@ public class WebController {
     @GetMapping("/students/detail/{id}")
     public String showStudentDetail(@PathVariable UUID id, Model model) {
         Student student = studentService.findById(id);
+        List<GraduationResult> results = resultService.findByStudentId(student.getId());
         model.addAttribute("student", student);
-        model.addAttribute("graduationResult", resultService.findByStudentId(student.getStudentCode()).stream().findFirst().orElse(null));
+        model.addAttribute("graduationResult", results.stream().findFirst().orElse(null));
         return "student_detail";
     }
 
@@ -211,7 +212,7 @@ public class WebController {
         ResultRequestDTO dto = new ResultRequestDTO();
         Student student = studentService.findByStudentCode(studentCode);
         if (student != null) {
-            dto.setStudentId(student.getStudentCode());
+            dto.setStudentId(student.getId().toString());
             dto.setGpa(student.getGpa());
             dto.setTotalCredits(student.getTotalCredits());
             dto.setFailedCredits(student.getFailedCredits());
@@ -238,8 +239,9 @@ public class WebController {
     public String showResultDetail(@PathVariable UUID id, Model model) {
         GraduationResult result = resultService.findById(id);
         GraduationCondition condition = result.getConditionId() != null ? conditionService.findById(result.getConditionId()) : null;
+        Student student = resolveResultStudent(result);
         model.addAttribute("result", result);
-        model.addAttribute("student", studentService.findByStudentCode(result.getStudentId()));
+        model.addAttribute("student", student);
         model.addAttribute("condition", condition);
         model.addAttribute("gpaPassed", condition != null && result.getGpa() != null && condition.getMinGpa() != null && result.getGpa().compareTo(condition.getMinGpa()) >= 0);
         model.addAttribute("creditPassed", condition != null && result.getTotalCredits() != null && condition.getMinTotalCredits() != null && result.getTotalCredits() >= condition.getMinTotalCredits());
@@ -280,12 +282,12 @@ public class WebController {
     }
 
     private List<GraduationResultView> buildStudentResultViews() {
-        Map<String, GraduationResult> resultByStudentCode = resultService.findAll().stream()
-            .filter(result -> result.getStudentId() != null && !result.getStudentId().isBlank())
-            .collect(Collectors.toMap(GraduationResult::getStudentId, result -> result, (first, second) -> first));
+        Map<String, GraduationResult> resultByStudentKey = resultService.findAll().stream()
+            .filter(result -> result.getStudentId() != null)
+            .collect(Collectors.toMap(result -> result.getStudentId().toString(), result -> result, (first, second) -> first));
 
         return studentService.findAll().stream()
-            .map(student -> new GraduationResultView(resultByStudentCode.get(student.getStudentCode()), student))
+            .map(student -> new GraduationResultView(findResultForStudent(resultByStudentKey, student), student))
             .collect(Collectors.toList());
     }
 
@@ -304,6 +306,7 @@ public class WebController {
         dto.setFailedCredits(student.getFailedCredits());
         dto.setEnglishStatus(student.getEnglishStatus());
         dto.setItStatus(student.getItStatus());
+        dto.setStatus(student.getStatus() != null && !student.getStatus().isBlank() ? student.getStatus() : "Đang học");
         dto.setIsActive(student.getIsActive());
         return dto;
     }
@@ -311,7 +314,7 @@ public class WebController {
     private ResultRequestDTO toResultDTO(GraduationResult entity) {
         ResultRequestDTO dto = new ResultRequestDTO();
         dto.setId(entity.getId() != null ? entity.getId().toString() : null);
-        dto.setStudentId(entity.getStudentId());
+        dto.setStudentId(entity.getStudentId() != null ? entity.getStudentId().toString() : null);
         dto.setConditionId(entity.getConditionId() != null ? entity.getConditionId().toString() : null);
         dto.setGpa(entity.getGpa());
         dto.setTotalCredits(entity.getTotalCredits());
@@ -322,5 +325,18 @@ public class WebController {
         dto.setReviewer(entity.getReviewer() != null ? entity.getReviewer().toString() : null);
         dto.setNote(entity.getNote());
         return dto;
+    }
+
+    private GraduationResult findResultForStudent(Map<String, GraduationResult> resultByStudentKey, Student student) {
+        GraduationResult result = resultByStudentKey.get(student.getId().toString());
+        return result;
+    }
+
+    private Student resolveResultStudent(GraduationResult result) {
+        if (result == null || result.getStudentId() == null) {
+            return null;
+        }
+
+        return studentService.findById(result.getStudentId());
     }
 }

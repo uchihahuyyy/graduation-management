@@ -1,7 +1,51 @@
 USE school23;
 GO
 
+IF COL_LENGTH('students', 'status') IS NULL
+BEGIN
+    ALTER TABLE students ADD status NVARCHAR(50) DEFAULT N'Đang học';
+END
+GO
+
+UPDATE students
+SET status = N'Đang học'
+WHERE status IS NULL OR LTRIM(RTRIM(status)) = N'';
+GO
+
+DECLARE @programId UNIQUEIDENTIFIER;
 DECLARE @conditionST23 UNIQUEIDENTIFIER;
+
+SELECT TOP 1 @programId = id
+FROM programs
+WHERE program_code = N'CNTT';
+
+IF @programId IS NULL
+BEGIN
+    SET @programId = NEWID();
+
+    INSERT INTO programs (
+        id,
+        program_code,
+        program_name,
+        major_name,
+        education_level,
+        total_required_credits,
+        created_at,
+        updated_at,
+        is_active
+    )
+    VALUES (
+        @programId,
+        N'CNTT',
+        N'Chương trình Công nghệ thông tin',
+        N'Công nghệ thông tin',
+        N'Đại học',
+        120,
+        SYSDATETIME(),
+        SYSDATETIME(),
+        1
+    );
+END
 
 SELECT TOP 1 @conditionST23 = id
 FROM graduation_conditions
@@ -29,7 +73,7 @@ BEGIN
     )
     VALUES (
         @conditionST23,
-        NEWID(),
+        @programId,
         N'ST23',
         120,
         2.00,
@@ -82,6 +126,16 @@ BEGIN
             WHEN @failedCredits > 3 THEN N'Tín chỉ rớt vượt mức cho phép'
             ELSE N'Chưa đủ điều kiện tốt nghiệp'
         END;
+    DECLARE @studentStatus NVARCHAR(50) =
+        CASE
+            WHEN @result = 1 AND @i % 10 = 0 THEN N'Đã tốt nghiệp'
+            WHEN @result = 1 THEN N'Đủ điều kiện TN'
+            WHEN @totalCredits < 120 OR @failedCredits > 3 THEN N'Nợ môn'
+            WHEN @gpa < 2.00 THEN N'Cảnh báo học vụ'
+            WHEN @i % 17 = 0 THEN N'Bảo lưu'
+            WHEN @i % 23 = 0 THEN N'Thôi học'
+            ELSE N'Đang học'
+        END;
 
     IF NOT EXISTS (SELECT 1 FROM students WHERE student_code = @studentCode)
     BEGIN
@@ -99,6 +153,7 @@ BEGIN
             failed_credits,
             english_status,
             it_status,
+            status,
             created_at,
             updated_at,
             is_active
@@ -117,13 +172,17 @@ BEGIN
             @failedCredits,
             CASE WHEN @i % 5 = 0 THEN N'Chưa đạt' ELSE N'TOEIC 450' END,
             CASE WHEN @i % 7 = 0 THEN N'Chưa đạt' ELSE N'Đạt' END,
+            @studentStatus,
             SYSDATETIME(),
             SYSDATETIME(),
             1
         );
     END
 
-    IF NOT EXISTS (SELECT 1 FROM graduation_results WHERE student_id = @studentCode)
+    DECLARE @studentId UNIQUEIDENTIFIER;
+    SELECT @studentId = id FROM students WHERE student_code = @studentCode;
+
+    IF @studentId IS NOT NULL AND NOT EXISTS (SELECT 1 FROM graduation_results WHERE student_id = @studentId)
     BEGIN
         INSERT INTO graduation_results (
             id,
@@ -143,7 +202,7 @@ BEGIN
         )
         VALUES (
             NEWID(),
-            @studentCode,
+            @studentId,
             @conditionST23,
             @gpa,
             @totalCredits,
@@ -168,6 +227,7 @@ FROM students
 WHERE cohort = N'ST23';
 
 SELECT COUNT(*) AS st23_results_count
-FROM graduation_results
-WHERE student_id LIKE N'ST23-%';
+FROM graduation_results gr
+JOIN students s ON s.id = gr.student_id
+WHERE s.student_code LIKE N'ST23-%';
 GO
