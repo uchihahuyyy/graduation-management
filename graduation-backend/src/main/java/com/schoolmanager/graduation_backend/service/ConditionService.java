@@ -47,6 +47,7 @@ public class ConditionService {
         entity.setEnglishRequirement(dto.getEnglishRequirement());
         entity.setItRequirement(dto.getItRequirement());
         entity.setConductRequired(dto.getConductRequired());
+        entity.setRequireTuitionCleared(dto.getRequireTuitionCleared());
         entity.setNote(dto.getNote());
         // createdAt/updatedAt và createdBy/updatedBy được JPA Auditing xử lý tự động
 
