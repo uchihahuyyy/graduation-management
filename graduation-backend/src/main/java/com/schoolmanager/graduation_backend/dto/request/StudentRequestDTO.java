@@ -21,5 +21,6 @@ public class StudentRequestDTO {
     private Integer failedCredits;
     private String englishStatus;
     private String itStatus;
+    private String status = "Đang học";
     private Boolean isActive = true;
 }

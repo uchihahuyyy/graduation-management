@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @Repository
 public interface ResultRepository extends JpaRepository<GraduationResult, UUID> {
-    boolean existsByStudentId(String studentId);
-    List<GraduationResult> findByStudentId(String studentId);
+    boolean existsByStudentId(UUID studentId);
+    List<GraduationResult> findByStudentId(UUID studentId);
     void deleteByConditionId(UUID conditionId);
-    void deleteByStudentId(String studentId);
+    void deleteByStudentId(UUID studentId);
 }

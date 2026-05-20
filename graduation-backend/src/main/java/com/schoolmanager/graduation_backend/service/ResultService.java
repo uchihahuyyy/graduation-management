@@ -5,6 +5,7 @@ import com.schoolmanager.graduation_backend.entity.GraduationResult;
 import com.schoolmanager.graduation_backend.entity.Student;
 import com.schoolmanager.graduation_backend.repository.ResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,10 +26,22 @@ public class ResultService {
         if (studentId == null || studentId.isBlank()) {
             return List.of();
         }
-        return resultRepository.findByStudentId(studentId.trim());
+
+        try {
+            return findByStudentId(UUID.fromString(studentId.trim()));
+        } catch (IllegalArgumentException e) {
+            return List.of();
+        }
     }
 
-    public GraduationResult findById(UUID id) {
+    public List<GraduationResult> findByStudentId(UUID studentId) {
+        if (studentId == null) {
+            return List.of();
+        }
+        return resultRepository.findByStudentId(studentId);
+    }
+
+    public GraduationResult findById(@NonNull UUID id) {
         return resultRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy kết quả xét tốt nghiệp với ID: " + id));
     }
@@ -45,8 +58,7 @@ public class ResultService {
             entity.setIsActive(true);
         }
 
-        // studentId giờ là String thuần — set thẳng, không cần convert
-        entity.setStudentId(dto.getStudentId() != null ? dto.getStudentId().trim() : null);
+        entity.setStudentId(parseUuid(dto.getStudentId()));
         entity.setConditionId(parseUuid(dto.getConditionId())); // conditionId vẫn là UUID
         entity.setGpa(dto.getGpa());
         entity.setTotalCredits(dto.getTotalCredits());
@@ -62,17 +74,16 @@ public class ResultService {
     }
 
     public void ensurePendingResult(Student student) {
-        if (student == null || student.getStudentCode() == null || student.getStudentCode().isBlank()) {
+        if (student == null || student.getId() == null) {
             return;
         }
 
-        String studentCode = student.getStudentCode().trim();
-        if (resultRepository.existsByStudentId(studentCode)) {
+        if (resultRepository.existsByStudentId(student.getId())) {
             return;
         }
 
         GraduationResult result = new GraduationResult();
-        result.setStudentId(studentCode);
+        result.setStudentId(student.getId());
         result.setGpa(student.getGpa());
         result.setTotalCredits(student.getTotalCredits());
         result.setFailedCredits(student.getFailedCredits());
@@ -87,31 +98,30 @@ public class ResultService {
         students.forEach(this::ensurePendingResult);
     }
 
-    public void softDelete(UUID id) {
+    public void softDelete(@NonNull UUID id) {
         GraduationResult entity = findById(id);
         entity.setIsActive(false);
         entity.setDeletedAt(LocalDateTime.now());
         resultRepository.save(entity);
     }
 
-    public void hardDelete(UUID id) {
+    public void hardDelete(@NonNull UUID id) {
         findById(id);
         resultRepository.deleteById(id);
     }
 
     public void relinkStudentCode(String oldStudentCode, String newStudentCode) {
-        if (oldStudentCode == null || newStudentCode == null || oldStudentCode.equals(newStudentCode)) {
-            return;
+        // graduation_results.student_id now stores students.id, so changing student_code no longer requires relinking.
+    }
+
+    public void hardDeleteByStudentId(UUID studentId) {
+        if (studentId != null) {
+            resultRepository.deleteByStudentId(studentId);
         }
-        List<GraduationResult> results = resultRepository.findByStudentId(oldStudentCode);
-        results.forEach(result -> result.setStudentId(newStudentCode));
-        resultRepository.saveAll(results);
     }
 
     public void hardDeleteByStudentCode(String studentCode) {
-        if (studentCode != null && !studentCode.isBlank()) {
-            resultRepository.deleteByStudentId(studentCode.trim());
-        }
+        // graduation_results.student_id stores students.id, so student_code cleanup is no longer needed.
     }
 
     /** Chuyển String → UUID an toàn; trả về null nếu chuỗi rỗng hoặc null */
