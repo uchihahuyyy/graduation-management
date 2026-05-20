@@ -25,7 +25,7 @@ public class ConditionService {
             .orElseThrow(() -> new RuntimeException("Không tìm thấy điều kiện xét tốt nghiệp với ID: " + id));
     }
 
-    public void save(ConditionRequestDTO dto) {
+    public GraduationCondition save(ConditionRequestDTO dto) {
         GraduationCondition entity;
 
         if (dto.getId() != null) {
@@ -48,7 +48,7 @@ public class ConditionService {
         entity.setNote(dto.getNote());
         // createdAt/updatedAt và createdBy/updatedBy được JPA Auditing xử lý tự động
 
-        conditionRepository.save(entity);
+        return conditionRepository.save(entity);
     }
 
     public void softDelete(UUID id) {
@@ -56,5 +56,10 @@ public class ConditionService {
         entity.setIsActive(false);
         entity.setDeletedAt(LocalDateTime.now());
         conditionRepository.save(entity);
+    }
+
+    public void hardDelete(UUID id) {
+        GraduationCondition entity = findById(id);
+        conditionRepository.delete(entity);
     }
 }
