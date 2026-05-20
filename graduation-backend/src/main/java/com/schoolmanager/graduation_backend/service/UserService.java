@@ -5,14 +5,12 @@ import com.schoolmanager.graduation_backend.entity.User;
 import com.schoolmanager.graduation_backend.repository.RoleRepository;
 import com.schoolmanager.graduation_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -24,18 +22,15 @@ public class UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(UUID id) {
+    public Optional<User> getUserById(@NonNull UUID id) {
         return userRepository.findById(id);
     }
 
-    public void grantAdminRole(UUID userId) throws Exception {
+    public void grantAdminRole(@NonNull UUID userId) throws Exception {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new Exception("Không tìm thấy người dùng!"));
 
@@ -47,7 +42,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void revokeAdminRole(UUID userId) throws Exception {
+    public void revokeAdminRole(@NonNull UUID userId) throws Exception {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new Exception("Không tìm thấy người dùng!"));
 
@@ -59,7 +54,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(UUID userId) throws Exception {
+    public void deleteUser(@NonNull UUID userId) throws Exception {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new Exception("Không tìm thấy người dùng!"));
 
@@ -75,7 +70,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void toggleUserActive(UUID userId) throws Exception {
+    public void toggleUserActive(@NonNull UUID userId) throws Exception {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new Exception("Không tìm thấy người dùng!"));
 

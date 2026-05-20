@@ -12,6 +12,7 @@ import java.util.UUID;
 public class ResultTableRowDTO {
     private final UUID id;
     private final String studentId;
+    private final String studentCode;
     private final String fullName;
     private final String className;
     private final String cohort;
@@ -28,10 +29,11 @@ public class ResultTableRowDTO {
 
     public ResultTableRowDTO(GraduationResult result, Student student) {
         this.id = result.getId();
-        this.studentId = result.getStudentId();
+        this.studentId = result.getStudentId() != null ? result.getStudentId().toString() : null;
+        this.studentCode = student != null ? student.getStudentCode() : null;
         this.fullName = student != null ? student.getFullName() : null;
         this.className = student != null ? student.getClassName() : null;
-        this.cohort = student != null ? student.getCohort() : inferCohort(result.getStudentId());
+        this.cohort = student != null ? student.getCohort() : null;
         this.gpa = result.getGpa();
         this.totalCredits = result.getTotalCredits();
         this.failedCredits = result.getFailedCredits();
@@ -42,10 +44,6 @@ public class ResultTableRowDTO {
         this.decisionDate = result.getDecisionDate();
         this.reviewer = result.getReviewer();
         this.note = result.getNote();
-    }
-
-    private String inferCohort(String studentId) {
-        return studentId != null && studentId.length() >= 3 ? studentId.substring(0, 3) : null;
     }
 
     private String toResultText(Byte value) {

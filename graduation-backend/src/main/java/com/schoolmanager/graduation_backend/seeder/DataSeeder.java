@@ -1,7 +1,9 @@
 package com.schoolmanager.graduation_backend.seeder;
 
 import com.schoolmanager.graduation_backend.entity.Role;
+import com.schoolmanager.graduation_backend.entity.Program;
 import com.schoolmanager.graduation_backend.entity.User;
+import com.schoolmanager.graduation_backend.repository.ProgramRepository;
 import com.schoolmanager.graduation_backend.repository.RoleRepository;
 import com.schoolmanager.graduation_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +27,17 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ProgramRepository programRepository;
+
     @Override
     public void run(String... args) throws Exception {
         // Seed Roles
         Role superadminRole = createRoleIfNotFound("ROLE_SUPERADMIN");
-        Role adminRole = createRoleIfNotFound("ROLE_ADMIN");
-        Role userRole = createRoleIfNotFound("ROLE_USER");
+        createRoleIfNotFound("ROLE_ADMIN");
+        createRoleIfNotFound("ROLE_USER");
+
+        seedDefaultProgram();
 
         // Seed Superadmin
         if (!userRepository.existsByUsername("superadmin")) {
@@ -58,5 +65,21 @@ public class DataSeeder implements CommandLineRunner {
             role.setIsActive(true);
             return roleRepository.save(role);
         });
+    }
+
+    private void seedDefaultProgram() {
+        if (programRepository.existsByProgramCode("CNTT")) {
+            return;
+        }
+
+        Program program = new Program();
+        program.setProgramCode("CNTT");
+        program.setProgramName("Chương trình Công nghệ thông tin");
+        program.setMajorName("Công nghệ thông tin");
+        program.setEducationLevel("Đại học");
+        program.setTotalRequiredCredits(120);
+        program.setCreatedAt(LocalDateTime.now());
+        program.setIsActive(true);
+        programRepository.save(program);
     }
 }

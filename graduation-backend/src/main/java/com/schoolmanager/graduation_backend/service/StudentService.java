@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,8 @@ import java.util.UUID;
 @Service
 public class StudentService {
 
+    private static final String DEFAULT_STUDENT_STATUS = "Đang học";
+
     private final StudentRepository studentRepository;
     private final ResultService resultService;
 
@@ -35,7 +38,7 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student findById(UUID id) {
+    public Student findById(@NonNull UUID id) {
         return studentRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên với ID: " + id));
     }
@@ -63,6 +66,7 @@ public class StudentService {
         student.setFailedCredits(dto.getFailedCredits());
         student.setEnglishStatus(trim(dto.getEnglishStatus()));
         student.setItStatus(trim(dto.getItStatus()));
+        student.setStatus(normalizeStatus(dto.getStatus()));
         student.setIsActive(dto.getIsActive() == null || dto.getIsActive());
         Student savedStudent = studentRepository.save(student);
         resultService.relinkStudentCode(oldStudentCode, savedStudent.getStudentCode());
@@ -70,7 +74,7 @@ public class StudentService {
         return savedStudent;
     }
 
-    public void softDelete(UUID id) {
+    public void softDelete(@NonNull UUID id) {
         Student student = findById(id);
         student.setIsActive(false);
         student.setDeletedAt(LocalDateTime.now());
@@ -78,8 +82,9 @@ public class StudentService {
     }
 
     @Transactional
-    public void hardDelete(UUID id) {
+    public void hardDelete(@NonNull UUID id) {
         Student student = findById(id);
+        resultService.hardDeleteByStudentId(student.getId());
         resultService.hardDeleteByStudentCode(student.getStudentCode());
         studentRepository.deleteById(id);
     }
@@ -107,6 +112,7 @@ public class StudentService {
                 student.setFailedCredits(readInteger(row, 9));
                 student.setEnglishStatus(readString(row, 10));
                 student.setItStatus(readString(row, 11));
+                student.setStatus(normalizeStatus(readString(row, 12)));
                 student.setIsActive(true);
                 Student savedStudent = studentRepository.save(student);
                 resultService.ensurePendingResult(savedStudent);
@@ -142,7 +148,7 @@ public class StudentService {
                 row.createCell(9).setCellValue(student.getFailedCredits() != null ? student.getFailedCredits() : 0);
                 row.createCell(10).setCellValue(value(student.getEnglishStatus()));
                 row.createCell(11).setCellValue(value(student.getItStatus()));
-                row.createCell(12).setCellValue(Boolean.TRUE.equals(student.getIsActive()) ? "Active" : "Inactive");
+                row.createCell(12).setCellValue(normalizeStatus(student.getStatus()));
             }
             workbook.write(out);
             return out.toByteArray();
@@ -157,6 +163,11 @@ public class StudentService {
 
     private String value(String value) {
         return value == null ? "" : value;
+    }
+
+    private String normalizeStatus(String status) {
+        String value = trim(status);
+        return value == null || value.isBlank() ? DEFAULT_STUDENT_STATUS : value;
     }
 
     private String readString(Row row, int index) {

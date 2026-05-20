@@ -42,7 +42,7 @@ public class GraduationResultApiController {
     public ResponseEntity<List<ResultTableRowDTO>> getTableRows() {
         return ResponseEntity.ok(resultService.findAll().stream()
             .map(result -> {
-                Student student = studentService.findByStudentCode(result.getStudentId());
+                Student student = resolveResultStudent(result);
                 return new ResultTableRowDTO(result, student);
             })
             .collect(Collectors.toList()));
@@ -50,7 +50,12 @@ public class GraduationResultApiController {
 
     @GetMapping("/by-student/{studentCode}")
     public ResponseEntity<List<GraduationResult>> getByStudentCode(@PathVariable String studentCode) {
-        return ResponseEntity.ok(resultService.findByStudentId(studentCode));
+        Student student = studentService.findByStudentCode(studentCode);
+        if (student == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        return ResponseEntity.ok(resultService.findByStudentId(student.getId()));
     }
 
     @GetMapping("/{id}")
@@ -86,5 +91,13 @@ public class GraduationResultApiController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    private Student resolveResultStudent(GraduationResult result) {
+        if (result == null || result.getStudentId() == null) {
+            return null;
+        }
+
+        return studentService.findById(result.getStudentId());
     }
 }

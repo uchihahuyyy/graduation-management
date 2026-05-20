@@ -25,7 +25,7 @@
         <a href="/dashboard" class="brand-link"><span class="brand-badge"><i class="fas fa-graduation-cap"></i></span><span class="brand-text">Graduation System</span></a>
         <div class="sidebar"><nav class="mt-4"><ul class="nav nav-pills nav-sidebar flex-column">
             <li class="nav-item"><a href="/dashboard" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
-            <li class="nav-header">XI. NHÓM QUẢN LÝ TỐT NGHIỆP</li>
+            <li class="nav-header">NHÓM QUẢN LÝ TỐT NGHIỆP</li>
             <li class="nav-item"><a href="/students" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Sinh viên</p></a></li>
             <li class="nav-item"><a href="/conditions" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Điều kiện tốt nghiệp</p></a></li>
             <li class="nav-item"><a href="/assessment" class="nav-link"><i class="nav-icon far fa-circle"></i><p>Xét tốt nghiệp</p></a></li>
@@ -58,7 +58,7 @@
                             <label>Sinh viên</label>
                             <select th:field="*{studentId}" class="custom-select" required>
                                 <option value="">Chọn sinh viên từ bảng sinh viên</option>
-                                <option th:each="student : ${students}" th:value="${student.studentCode}" th:text="${student.studentCode + ' - ' + student.fullName}">K21-0001 - Nguyễn Văn A</option>
+                                <option th:each="student : ${students}" th:value="${student.id.toString()}" th:text="${student.studentCode + ' - ' + student.fullName}">K21-0001 - Nguyễn Văn A</option>
                             </select>
                         </div>
                         <div class="col-md-4 form-group"><label>Điều kiện áp dụng</label><select th:field="*{conditionId}" class="custom-select"><option value="">Chọn điều kiện</option><option th:each="cond : ${conditions}" th:value="${cond.id.toString()}" th:text="${cond.appliedCohort + ' - GPA >= ' + (cond.minGpa != null ? cond.minGpa : 'N/A')}">Condition</option></select></div>

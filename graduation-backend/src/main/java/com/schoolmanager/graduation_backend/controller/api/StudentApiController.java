@@ -47,7 +47,12 @@ public class StudentApiController {
 
     @GetMapping("/code/{studentCode}/graduation-results")
     public ResponseEntity<List<GraduationResult>> getGraduationResultsByStudentCode(@PathVariable String studentCode) {
-        return ResponseEntity.ok(resultService.findByStudentId(studentCode));
+        Student student = studentService.findByStudentCode(studentCode);
+        if (student == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        return ResponseEntity.ok(resultService.findByStudentId(student.getId()));
     }
 
     @PostMapping
