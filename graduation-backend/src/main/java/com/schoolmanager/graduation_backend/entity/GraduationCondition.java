@@ -42,6 +42,9 @@ public class GraduationCondition extends BaseAuditEntity {
     @Column(name = "conduct_required", length = 50)
     private String conductRequired;
 
+    @Column(name = "require_tuition_cleared")
+    private Boolean requireTuitionCleared;
+
     @Column(name = "note", columnDefinition = "NVARCHAR(MAX)")
     private String note;
 }

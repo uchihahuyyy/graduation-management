@@ -60,10 +60,13 @@ public class ResultService {
 
         entity.setStudentId(parseUuid(dto.getStudentId()));
         entity.setConditionId(parseUuid(dto.getConditionId())); // conditionId vẫn là UUID
+        entity.setPeriodId(parseUuid(dto.getPeriodId()));
         entity.setGpa(dto.getGpa());
         entity.setTotalCredits(dto.getTotalCredits());
         entity.setFailedCredits(dto.getFailedCredits());
         entity.setResult(dto.getResult());
+        entity.setStatus(dto.getStatus());
+        entity.setDecisionNumber(dto.getDecisionNumber());
         entity.setClassification(dto.getClassification());
         entity.setDecisionDate(dto.getDecisionDate());
         entity.setReviewer(parseUuid(dto.getReviewer())); // reviewer vẫn là UUID

@@ -215,3 +215,58 @@ BEGIN
     CREATE INDEX IX_graduation_conditions_program_id ON graduation_conditions(program_id);
 END
 GO
+
+IF OBJECT_ID('graduation_periods', 'U') IS NULL
+BEGIN
+    CREATE TABLE graduation_periods (
+        id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        name NVARCHAR(200) NOT NULL,
+        start_date DATE,
+        end_date DATE,
+        status NVARCHAR(50),
+        created_at DATETIME2,
+        updated_at DATETIME2,
+        created_by UNIQUEIDENTIFIER,
+        updated_by UNIQUEIDENTIFIER,
+        deleted_at DATETIME2,
+        deleted_by UNIQUEIDENTIFIER,
+        is_active BIT DEFAULT 1
+    );
+END
+GO
+
+IF COL_LENGTH('graduation_conditions', 'require_tuition_cleared') IS NULL
+BEGIN
+    ALTER TABLE graduation_conditions ADD require_tuition_cleared BIT;
+END
+GO
+
+IF COL_LENGTH('graduation_results', 'period_id') IS NULL
+BEGIN
+    ALTER TABLE graduation_results ADD period_id UNIQUEIDENTIFIER;
+END
+GO
+
+IF COL_LENGTH('graduation_results', 'status') IS NULL
+BEGIN
+    ALTER TABLE graduation_results ADD status NVARCHAR(50);
+END
+GO
+
+IF COL_LENGTH('graduation_results', 'decision_number') IS NULL
+BEGIN
+    ALTER TABLE graduation_results ADD decision_number NVARCHAR(100);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = 'FK_graduation_results_periods'
+)
+BEGIN
+    ALTER TABLE graduation_results
+    ADD CONSTRAINT FK_graduation_results_periods
+    FOREIGN KEY (period_id) REFERENCES graduation_periods(id);
+END
+GO

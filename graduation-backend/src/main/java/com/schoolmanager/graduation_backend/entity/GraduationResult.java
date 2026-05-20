@@ -24,6 +24,9 @@ public class GraduationResult extends BaseAuditEntity {
     @Column(name = "condition_id")
     private UUID conditionId;
 
+    @Column(name = "period_id")
+    private UUID periodId;
+
     @Column(name = "gpa", precision = 3, scale = 2)
     private BigDecimal gpa;
 
@@ -33,9 +36,14 @@ public class GraduationResult extends BaseAuditEntity {
     @Column(name = "failed_credits")
     private Integer failedCredits;
 
-    // null: Chờ xét, 0: Không đạt, 1: Đạt
     @Column(name = "result")
     private Byte result;
+
+    @Column(name = "status", length = 50)
+    private String status;
+
+    @Column(name = "decision_number", length = 100)
+    private String decisionNumber;
 
     // 1: Xuất sắc, 2: Giỏi, 3: Khá, 4: Trung bình
     @Column(name = "classification")

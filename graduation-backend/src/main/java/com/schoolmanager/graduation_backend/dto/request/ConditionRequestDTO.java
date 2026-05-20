@@ -15,5 +15,6 @@ public class ConditionRequestDTO {
     private String englishRequirement;
     private String itRequirement;
     private String conductRequired;
+    private Boolean requireTuitionCleared;
     private String note;
 }

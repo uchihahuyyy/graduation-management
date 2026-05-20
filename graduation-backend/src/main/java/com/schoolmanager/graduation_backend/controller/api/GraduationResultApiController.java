@@ -93,6 +93,13 @@ public class GraduationResultApiController {
         }
     }
 
+    @PostMapping("/auto-evaluate/{periodId}")
+    public ResponseEntity<?> autoEvaluate(@PathVariable UUID periodId) {
+        // Outline the logic for auto-evaluation here
+        // Currently, just returning a placeholder response
+        return ResponseEntity.ok("Tự động xét duyệt thành công cho đợt: " + periodId + ". (Chức năng này sẽ gọi các module Sinh viên, Điểm, Tài chính để xử lý thực tế)");
+    }
+
     private Student resolveResultStudent(GraduationResult result) {
         if (result == null || result.getStudentId() == null) {
             return null;

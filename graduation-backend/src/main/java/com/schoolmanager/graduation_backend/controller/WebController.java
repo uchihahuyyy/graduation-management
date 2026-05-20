@@ -157,6 +157,7 @@ public class WebController {
         dto.setEnglishRequirement(entity.getEnglishRequirement());
         dto.setItRequirement(entity.getItRequirement());
         dto.setConductRequired(entity.getConductRequired());
+        dto.setRequireTuitionCleared(entity.getRequireTuitionCleared());
         dto.setNote(entity.getNote());
 
         model.addAttribute("conditionDTO", dto);
@@ -316,10 +317,13 @@ public class WebController {
         dto.setId(entity.getId() != null ? entity.getId().toString() : null);
         dto.setStudentId(entity.getStudentId() != null ? entity.getStudentId().toString() : null);
         dto.setConditionId(entity.getConditionId() != null ? entity.getConditionId().toString() : null);
+        dto.setPeriodId(entity.getPeriodId() != null ? entity.getPeriodId().toString() : null);
         dto.setGpa(entity.getGpa());
         dto.setTotalCredits(entity.getTotalCredits());
         dto.setFailedCredits(entity.getFailedCredits());
         dto.setResult(entity.getResult());
+        dto.setStatus(entity.getStatus());
+        dto.setDecisionNumber(entity.getDecisionNumber());
         dto.setClassification(entity.getClassification());
         dto.setDecisionDate(entity.getDecisionDate());
         dto.setReviewer(entity.getReviewer() != null ? entity.getReviewer().toString() : null);
