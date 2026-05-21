@@ -47,3 +47,35 @@ Use these scripts when a teammate wants to run the graduation module locally or 
 - `seed_50_st23_students.sql` is safe to run more than once. It only inserts missing `ST23-*` students/results.
 - `graduation_results.student_id` is a SQL Server `uniqueidentifier` and references `students.id`.
 - The app also seeds login roles and the default `superadmin / superadmin` account on startup through `DataSeeder`.
+
+## Deploy on Render
+
+Create a Render Web Service from this repository with these settings:
+
+- Runtime: `Docker`
+- Root Directory: `graduation-backend`
+- Branch: `main`
+- Region: `Singapore (Southeast Asia)`
+
+Add these environment variables in Render before deploying:
+
+```text
+DB_URL=jdbc:sqlserver://den1.mssql7.gear.host:1433;databaseName=school23;encrypt=true;trustServerCertificate=true;
+DB_USERNAME=school23
+DB_PASSWORD=your-database-password
+SHOW_SQL=false
+THYMELEAF_CACHE=true
+```
+
+After deployment, open:
+
+```text
+https://your-render-service-name.onrender.com/login
+```
+
+Default seeded login:
+
+```text
+username: superadmin
+password: superadmin
+```
