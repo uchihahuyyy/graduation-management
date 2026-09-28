@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  backend:
+    image: phantranxuanhuy/graduation-management:latest
+    container_name: graduation-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # Các biến môi trường này sẽ nhận giá trị thực tế sau khi bạn tạo xong Database trên Somee
+      - SPRING_DATASOURCE_URL=${DB_URL}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
