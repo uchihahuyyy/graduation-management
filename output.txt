@@ -1,0 +1,322 @@
+
+--- Reading Bài 5. Quản lý container với Docker Compose.pptx ---
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1
+DEVOPS
+Bài 5: Quản lý container với Docker Compose
+1.1. Giới thiệu Docker Compose: khái niệm, cách sử dụng để định nghĩa và chạy ứng dụng đa container.
+1.2. File docker-compose.yml: cấu trúc và các tùy chọn cấu hình.
+1.3. Thực hành: Xây dựng ứng dụng đa container sử dụng Docker Compose.
+Bài 5: Quản lý container với Docker Compose
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+2
+1.1. Giới thiệu Docker Compose: khái niệm, cách sử dụng để định nghĩa và chạy ứng dụng đa container
+Docker Compose: là công cụ giúp định nghĩa và chạy ứng dụng đa container.
+Sử dụng file YAML (docker-compose.yml) để mô tả dịch vụ, mạng, volume.
+Ưu điểm:
+ Triển khai nhiều container cùng lúc.
+ Dễ dàng cấu hình và quản lý.
+ Phù hợp với môi trường phát triển, kiểm thử, staging.
+
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Giới thiệu Docker Compose: khái niệm, cách sử dụng để định nghĩa và chạy ứng dụng đa container
+Cách sử dụng Docker Compose:
+Viết file docker-compose.yml để định nghĩa các dịch vụ.
+Chạy lệnh docker-compose up để khởi động ứng dụng. 
+Chạy lệnh docker-compose down để dừng và xóa container.
+Quản lý container, volume, network thông qua Docker Compose.
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Giới thiệu Docker Compose: khái niệm, cách sử dụng để định nghĩa và chạy ứng dụng đa container.
+1.2. File docker-compose.yml: cấu trúc và các tùy chọn cấu hình.
+1.3. Thực hành: Xây dựng ứng dụng đa container sử dụng Docker Compose.
+Bài 5: Quản lý container với Docker Compose
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+5
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+6
+1.2. File docker-compose.yml: cấu trúc và các tùy chọn cấu hình
+Cấu trúc file docker-compose.yml:
+version: Phiên bản Docker Compose file format.
+services: Định nghĩa các container (mỗi container là một dịch vụ).
+image: Image Docker sử dụng.
+build: Chỉ định thư mục chứa Dockerfile để build image.
+ports: Mapping cổng host ↔ container.
+volumes: Gắn kết dữ liệu giữa host và container.
+networks: Định nghĩa mạng giữa các container.
+
+
+
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+7
+1.2. File docker-compose.yml: cấu trúc và các tùy chọn cấu hình
+Ví dụ file docker-compose.yml:
+
+
+
+1.1. Giới thiệu Docker Compose: khái niệm, cách sử dụng để định nghĩa và chạy ứng dụng đa container.
+1.2. File docker-compose.yml: cấu trúc và các tùy chọn cấu hình.
+1.3. Thực hành: Xây dựng ứng dụng đa container sử dụng Docker Compose.
+Bài 5: Quản lý container với Docker Compose
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+8
+1.3. Thực hành: Xây dựng ứng dụng đa container sử dụng Docker Compose
+Xây dựng ứng dụng web (dịch vụ web) và database (dịch vụ db).
+Viết file docker-compose.yml để định nghĩa 2 dịch vụ trên.
+Chạy docker-compose up để khởi động ứng dụng.
+Truy cập web và kiểm tra kết nối database.
+Dừng và xóa container với docker-compose down.
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+
+--- Reading CI-CD Jenkins + Docker + GitHub .docx ---
+CI/CD Jenkins + Docker + GitHub (Step-by-Step)
+1. Yêu cầu cài đặt & Chuẩn bị
+1.1. Hệ điều hành
+Ubuntu Server 22.04 LTS (khuyến nghị)
+RAM tối thiểu 2GB (tốt hơn là 4GB nếu build .NET/NodeJS nặng)
+Disk ≥ 30GB
+1.2. Tài khoản & công cụ
+GitHub: nơi lưu source code.
+Docker Hub: nơi push/pull image.
+Server production: nơi deploy (cài Docker + Compose).
+Jenkins server: có thể cùng hoặc tách với production.1.3. Network
+1.3. Network
+Mở port:
+8080 → Jenkins.
+22 → SSH.
+80/443 → Web app.
+1.4. Cấu trúc source code
+Lưu ý đây là cấu trúc của 1 dự án .NET9
+2. Cài Jenkins & Setup lần đầu
+2.1. Cài đặt Jenkins
+# Update hệ thống
+sudo apt update && sudo apt upgrade -y
+# Cài Java (Jenkins yêu cầu Java 17+)
+sudo apt install fontconfig openjdk-21-jre
+# Thêm key và repo Jenkins
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+# Cài Jenkins
+sudo apt update
+sudo apt install jenkins
+# Start Jenkins
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+2.2. Truy cập giao diện web
+Mở trình duyệt: http://<server-ip>:8080
+Lấy admin password: sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+Làm theo wizard: tạo admin user, cài plugin mặc định.
+3. Cài Docker & Docker Compose
+3.1. Cài Docker
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+3.3. Cài docker compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+3.4. Thêm quyền cho Jenkins & user
+sudo usermod -aG docker $USER
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+Kiểm tra Docker chạy: docker run hello-world
+4. Tạo Dockerfile
+Ví dụ ứng dụng .NET9 (bạn hãy thay bằng tech stack của mình để phù hợp với project của bạn):
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+# Copy solution and projects
+COPY LearnKing.sln ./
+COPY LearnKing.Application/*.csproj ./LearnKing.Application/
+COPY LearnKing.Common/*.csproj ./LearnKing.Common/
+COPY LearnKing.Domain/*.csproj ./LearnKing.Domain/
+COPY LearnKing.Infrastructure/*.csproj ./LearnKing.Infrastructure/
+COPY LearnKing.Api/*.csproj ./LearnKing.Api/
+# Restore
+RUN dotnet restore LearnKing.sln
+# Copy all source code
+COPY . .
+# Publish
+RUN dotnet publish LearnKing.Api/LearnKing.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
+# Stage 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:86
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+# Xoá file không cần thiết
+RUN find /app -name "*.pdb" -delete && \
+    find /app -name "*.xml" -delete
+EXPOSE 86
+# Run ứng dụng
+ENTRYPOINT ["dotnet", "LearnKing.Api.dll"]
+5. Viết docker-compose.prod.yml cho production server
+version: "3.9"
+services:
+  api:
+    image: docker.io/truongdev1510/server-lms-net:latest
+    container_name: lms-api
+    restart: always
+    ports:
+      - "3007:86"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
+      DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: 0
+    env_file:
+      - .env
+networks:
+  app-network:
+    driver: bridge
+6. Kết nối GitHub → Jenkins
+6.1. Tạo PAT (Personal Access Token) trên GitHub
+Vào Settings → Developer settings → Personal access tokens → Fine-grained tokens.
+Scope: repo (read), admin:repo_hook.
+Copy token.
+6.2. Add vào Jenkins
+Vào Manage Jenkins → Credentials → Global.
+Add new credential:
+Kind: Username with password
+Username: GitHub username
+Password: PAT token
+ID: github-pat 
+6.3. Tạo webhook GitHub
+Repo → Settings → Webhooks → Add webhook.
+URL: http://<jenkins-server>:8080/github-webhook/.
+Content type: application/json.
+Trigger: push events.
+7. Quản lý Credentials trong Jenkins
+dockerhub-cred → Docker Hub username + Access Token.
+server-ssh-key → SSH Private Key login vào production.
+db-conn → Secret text chứa connection string.
+docker-compose-file -->  docker file production
+8. Chuẩn bị Production server
+Cài Docker + Docker Compose.
+Copy public key vào ~/.ssh/authorized_keys.
+Có sẵn thư mục ~/project/ 
+9. Jenkinsfile (Pipeline Script)
+pipeline {
+    agent any
+    environment {
+        REGISTRY = "docker.io/${DOCKER_USERNAME}"
+        IMAGE_NAME = "server-lms-net"
+        SERVER_HOST = "103.20.96.174"
+        SERVER_USER = "root"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                  branches: [[name: '*/master']],
+                  userRemoteConfigs: [[
+                    url: 'https://github.com/XT-xuantruong/learnking.server.git',
+                    credentialsId: 'github-pat'
+                  ]]
+                ])
+            }
+        }
+        // stage('Build & Test') {
+        //     steps {
+        //         sh 'dotnet restore LearnKing.sln'
+        //         sh 'dotnet build LearnKing.sln -c Release'
+        //         //sh 'dotnet test LearnKing.sln'
+        //     }
+        // }
+        stage('Docker Build') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "docker build -t docker.io/$DOCKER_USER/$IMAGE_NAME:latest ."
+                }
+            }
+        }
+        stage('Push Docker Hub') {
+            steps {
+               withCredentials([usernamePassword(credentialsId: 'dockerhub-cred',
+                    usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                    sh "docker push docker.io/$DOCKER_USER/$IMAGE_NAME:latest"
+                }
+            }
+        }
+        stage('Deploy Server') {
+            steps {
+                withCredentials([
+                    usernamePassword(credentialsId: 'dockerhub-cred',
+                        usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS'),
+                    string(credentialsId: 'db-conn', variable: 'DB_CONN'),
+                    file(credentialsId: 'docker-compose-file', variable: 'DOCKER_COMPOSE_PATH')
+                ]) {
+                    sshagent (credentials: ['server-ssh-key']) {
+                        sh '''
+                        # Copy docker-compose.yml từ Jenkins sang server
+                        scp -o StrictHostKeyChecking=no $DOCKER_COMPOSE_PATH $SERVER_USER@$SERVER_HOST:~/project/docker-compose.yml
+                        # SSH vào server để deploy
+                        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+                        cd ~/project && \
+                        echo \\"DB_CONNECTION_STRING=$DB_CONN\\" > .env && \
+                        echo \\"$DOCKER_PASS\\" | docker login -u $DOCKER_USER --password-stdin && \
+                        docker compose --env-file .env pull && \
+                        docker compose --env-file .env down && \
+                        docker compose --env-file .env up -d && \
+                        docker image prune -f
+                        "
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
+10. Tạo Jenkins Pipeline Job
+Dashboard → New Item → Pipeline → đặt tên LMS-CICD.
+Pipeline script from SCM → Git → repo URL + branch master → credentials github-pat.
+Save.
+11. Test Pipeline
+Push code lên GitHub.
+Jenkins trigger job → chạy các stage: Checkout → Build → Docker Build → Push → Deploy.
+Vào server check container: docker ps
+Mở http://<server-ip>:<app-port> để test app.
+
+--- Reading Tạo Cloud VPS bằng DigitalOcean.docx ---
+Truy cập DigitalOcean: https://www.digitalocean.com
+Đăng ký tài khoản bằng thông báo khuyến mãi này:
+Lưu ý: 
+Trong bước tạo tài khoản thì nó sẽ mặc định vào tạo droplet thì bỏ qua bằng cách quay lại trang đích và đăng nhập lại để khi tạo xong phải có Free Trial Active như ảnh.
+Với DigitalOcean sẽ có yêu cầu nhập thẻ ngân hàng, khi hết 2 tháng free mình có thể tắt hết dịch vụ để không bị trừ tiền.
+Sau khi đăng nhập lại, tạo dự án nếu chưa có
+Sau đó tạo droplet
+Trong trang tạo droplet chọn:
+Choose Region: Singapore
+Data Center: SGP1 (Mặc định)
+Choose Image: OS -> Ubuntu
+Version: 22.04 (LTS) x64
+Droplet Type:
+CPU Options:
+Chọn Regular -> 18$/mo là đủ (nó free cho mình 200$ trong vòng 2 tháng nên đừng lo)
+Authentication Method: Muốn đơn giản thì chọn password, sau này cấu hình SSH Key sau. 
+Những bước này có thể chỉnh sửa hoặc không:
+
+Sau khi tạo thành công, nó sẽ cung cấp cho mình một “máy ảo” với cấu hình mình chọn và một ip như sau. 
+Lưu ý: Máy ảo này thao tác giống như dùng Ubuntu thông thường tuy nhiên vì là server nên nó sẽ không có GUI mà thao tác trực tiếp bằng terminal
+Để truy cập vào terminal máy ảo, chọn droplet mới tạo -> vào phần Access -> Launch Drop Console.
+Kết quả như sau:
+Ngoài ra, mình có thể truy cập terminal của Droplet (Server) từ terminal ở máy của mình (Local) thông qua câu lệnh:
+ssh root@<Server IP>
+Sau đó nhập mật khẩu (lúc mình tạo Droplet)
+Kết quả sau khi truy cập thành công:
+Như vậy mình đã có một “máy ảo” và IP có thể truy cập từ bất cứ đâu, tại đây mình tiếp tục cài docker và tiếp tục làm bài thực hành.
+Cuối cùng, mình có thể gắn domain để thay cho việc truy cập bằng IP thông qua cách tạo subdomain hoặc thay đổi DNS. (Không bắt buộc)

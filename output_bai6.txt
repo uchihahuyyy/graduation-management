@@ -1,0 +1,71 @@
+
+--- Reading Bài 6. CICD cơ bản với Jenkins.pptx ---
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1
+DEVOPS
+Bài 6: CICD cơ bản với Jenkins
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD.
+1.2. Xây dựng quy trình CI/CD đơn giản.
+1.3. Thực hành: Cấu hình Jenkins và tạo một quy trình CI/CD cho ứng dụng đơn giản.
+Bài 6: CICD cơ bản với Jenkins
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+2
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD
+Giới thiệu CI/CD
+CI (Continuous Integration): Tích hợp mã nguồn liên tục, phát hiện lỗi sớm.
+CD (Continuous Delivery/Deployment): Triển khai phần mềm nhanh chóng, an toàn.
+Lợi ích:
+ Tự động hóa quy trình build, test, deploy.
+ Giảm lỗi do thao tác thủ công.
+ Tăng tốc độ phát hành sản phẩm.
+
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD
+Công cụ CI/CD phổ biến
+Jenkins: Nền tảng tự động hóa mã nguồn mở, hỗ trợ nhiều plugin, tích hợp linh hoạt.
+GitLab CI/CD: Tích hợp sẵn trong GitLab, quản lý pipeline thông qua file
+.gitlab-ci.yml
+Ngoài ra: GitHub Actions, CircleCI, Travis CI,...
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD
+Giới thiệu về Jenkins
+Công cụ mã nguồn mở giúp tự động hóa:
+ Build phần mềm.
+ Chạy kiểm thử.
+ Triển khai ứng dụng.
+Ưu điểm:
+ Miễn phí, mạnh mẽ, nhiều plugin.
+ Dễ dàng mở rộng.
+ Hỗ trợ đa nền tảng.
+
+
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD.
+1.2. Xây dựng quy trình CI/CD đơn giản.
+1.3. Thực hành: Cấu hình Jenkins và tạo một quy trình CI/CD cho ứng dụng đơn giản.
+Bài 6: CICD cơ bản với Jenkins
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+6
+1.2. Xây dựng quy trình CI/CD đơn giản
+Quy trình CI/CD đơn giản:
+Developer commit code lên Git repository..
+Jenkins phát hiện thay đổi (qua webhook/polling). 
+Jenkins chạy pipeline: build ứng dụng, chạy test tự động, deploy lên môi trường staging/production.
+Thông báo kết quả cho nhóm phát triển.
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+1.1. Công cụ tự động hóa triển khai như Jenkins, GitLab CI/CD.
+1.2. Xây dựng quy trình CI/CD đơn giản.
+1.3. Thực hành: Cấu hình Jenkins và tạo một quy trình CI/CD cho ứng dụng đơn giản.
+Bài 6: CICD cơ bản với Jenkins
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
+8
+1.3. Thực hành: Cấu hình Jenkins và tạo một quy trình CI/CD cho ứng dụng đơn giản
+Cài đặt Jenkins trên máy chủ hoặc container.
+Kết nối Jenkins với Git repository.
+Tạo Pipeline với các bước:
+ Pull code từ Git.
+ Build ứng dụng.
+ Chạy test.
+ Deploy ứng dụng
+Kiểm tra và xác nhận quy trình hoạt động.
+KHOA CÔNG NGHỆ THÔNG TIN – DevOps
