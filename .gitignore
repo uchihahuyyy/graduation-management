@@ -1,0 +1,11 @@
+# SSH Private Keys - NEVER commit these!
+*.pem
+*.ppk
+
+# Environment files
+.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
