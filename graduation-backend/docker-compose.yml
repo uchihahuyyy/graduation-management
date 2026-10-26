@@ -8,7 +8,18 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Các biến môi trường này sẽ nhận giá trị thực tế sau khi bạn tạo xong Database trên Somee
       - SPRING_DATASOURCE_URL=${DB_URL}
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      # Giới hạn JVM heap để tránh OOM trên t3.micro (1GB RAM)
+      - JAVA_OPTS=-Xmx300m -Xms128m -XX:+UseContainerSupport
+    # Giới hạn tài nguyên container
+    mem_limit: 512m
+    mem_reservation: 256m
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
