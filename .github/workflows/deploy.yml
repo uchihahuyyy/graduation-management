@@ -1,4 +1,4 @@
-name: CI/CD Pipeline to Render
+name: CI/CD Pipeline to AWS EC2
 
 on:
   push:
@@ -34,3 +34,21 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/graduation-management:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 15.135.217.59
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            curl -s -o docker-compose.yml https://raw.githubusercontent.com/uchihahuyyy/graduation-management/main/graduation-backend/docker-compose.yml
+            docker compose pull
+            docker compose up -d
+
+
+
